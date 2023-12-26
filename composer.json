@@ -1,0 +1,21 @@
+{
+    "name": "lab1/lab1",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Kirill Tremaskin",
+            "email": "tremaskinkd@yandex.ru"
+        }
+    ],
+    "require": {
+        "illuminate/collections": "^10.29"
+    }
+    ,
+    "require-dev": {
+        "roave/security-advisories": "dev-latest"
+    }
+}

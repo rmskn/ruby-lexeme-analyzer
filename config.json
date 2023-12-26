@@ -1,0 +1,17 @@
+{
+  "pathToDataDir": "data/",
+  "inputFileNames": [
+    "input.txt"
+  ],
+  "identifierMaxLength": 20,
+  "comment": {
+    "single": "#",
+    "start": "=begin",
+    "end": "=end"
+  },
+  "operators": ["==", "!=", "<", ">", "<=", ">=", "<=>", "!", "&&", "||", "+", "-", "*", "=", ";"],
+  "serviceWords": ["until", "do", "end"],
+  "globalVariableSymbol": "$",
+  "displayComments": false,
+  "realtimeOutputMode": 2
+}
