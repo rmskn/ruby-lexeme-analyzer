@@ -55,7 +55,6 @@ class Compiler
     public function __construct(
         private readonly object $config,
         private readonly Sets $sets,
-        private readonly RealtimeOutputModeEnum $realtimeOutputMode,
     )
     {
         $this->standardTable = collect();
@@ -317,7 +316,7 @@ class Compiler
             return;
         }
 
-        switch ($this->realtimeOutputMode) {
+        switch ($this->config->realtimeOutputMode) {
             case RealtimeOutputModeEnum::TOKENS_WITH_HEADER:
                 if (!$this->headerWasPrint) {
                     echo "Литерал\t|\tТип\n";

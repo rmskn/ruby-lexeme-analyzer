@@ -11,12 +11,13 @@ use App\Services\SetsUtils;
 
 // Получение базовой конфигурации
 $config = json_decode(file_get_contents('config.json'), false, 512, JSON_THROW_ON_ERROR);
+$config->realtimeOutputMode = RealtimeOutputModeEnum::tryFrom($config->realtimeOutputMode) ?? 0;
 
 // Генерация сетов
 $sets = SetsUtils::generateSets();
 
 // Создание экземпляра класса "компилятора"
-$compiler = new Compiler($config, $sets, RealtimeOutputModeEnum::TOKENS_WITH_HEADER);
+$compiler = new Compiler($config, $sets);
 
 foreach ($config->inputFileNames as $inputFileName) {
     echo "Сканирование файла {$inputFileName}\n";
