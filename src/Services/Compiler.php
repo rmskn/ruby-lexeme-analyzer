@@ -136,7 +136,6 @@ class Compiler
                         $this->addToken($token, $type);
                         // Переход к распознованию следующей лексемы
                         $type = null;
-
                     } else {
                         Log::error("Некорректный идентификатор: {$token}");
 
