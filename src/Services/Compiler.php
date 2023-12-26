@@ -264,11 +264,11 @@ class Compiler
             $this->serviceWords
         );
         $this->printTable(
-            'Идентификаторы ('  . $this->getNumberOfTableByTokenTypeName(TokenTypeEnum::IDENTIFIER) . ')',
+            'Идентификаторы (' . $this->getNumberOfTableByTokenTypeName(TokenTypeEnum::IDENTIFIER) . ')',
             $this->identifiers
         );
         $this->printTable(
-            'Литералы ('  . $this->getNumberOfTableByTokenTypeName(TokenTypeEnum::LITERAL) . ')',
+            'Литералы (' . $this->getNumberOfTableByTokenTypeName(TokenTypeEnum::LITERAL) . ')',
             $this->literals
         );
         $this->printTable(
@@ -298,7 +298,7 @@ class Compiler
 
         foreach ($this->standardTable as $item) {
             echo "{$item->table},{$item->number}\t"
-                . $this->getTableCollectionByNumber($item->table)[$item->number]. "\n";
+                . $this->getTableCollectionByNumber($item->table)[$item->number] . "\n";
         }
     }
 
@@ -321,7 +321,7 @@ class Compiler
         switch ($type) {
             case TokenTypeEnum::SERVICE:
                 $this->serviceWords[] = $token;
-                $this->standardTable[] =new TokenAddress(
+                $this->standardTable[] = new TokenAddress(
                     $this->getNumberOfTableByTokenTypeName($type),
                     $this->serviceWords->count() - 1
                 );
@@ -329,7 +329,7 @@ class Compiler
                 break;
             case TokenTypeEnum::IDENTIFIER:
                 $this->identifiers[] = $token;
-                $this->standardTable[] =new TokenAddress(
+                $this->standardTable[] = new TokenAddress(
                     $this->getNumberOfTableByTokenTypeName($type),
                     $this->identifiers->count() - 1
                 );
@@ -337,7 +337,7 @@ class Compiler
                 break;
             case TokenTypeEnum::LITERAL:
                 $this->literals[] = $token;
-                $this->standardTable[] =new TokenAddress(
+                $this->standardTable[] = new TokenAddress(
                     $this->getNumberOfTableByTokenTypeName($type),
                     $this->literals->count() - 1
                 );
@@ -345,7 +345,7 @@ class Compiler
                 break;
             case TokenTypeEnum::SEPARATOR:
                 $this->separators[] = $token;
-                $this->standardTable[] =new TokenAddress(
+                $this->standardTable[] = new TokenAddress(
                     $this->getNumberOfTableByTokenTypeName($type),
                     $this->separators->count() - 1
                 );
