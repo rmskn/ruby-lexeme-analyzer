@@ -20,7 +20,8 @@ $sets = SetsUtils::generateSets();
 $compiler = new Compiler($config, $sets);
 
 foreach ($config->inputFileNames as $inputFileName) {
-    echo "Сканирование файла {$inputFileName}\n";
+    Log::info("Сканирование файла {$inputFileName}\n");
+
     // Чтение информации из входного файла
     $inputFileData = file_get_contents($config->pathToDataDir . $inputFileName);
 
@@ -29,7 +30,11 @@ foreach ($config->inputFileNames as $inputFileName) {
 
     // Вывод результата
     if ($result === true) {
-        $compiler->printResult();
+        if ($config->printResult) {
+            $compiler->printResult();
+        }
+
+        Log::info("Сканирование файла {$inputFileName} успешно завершено\n");
     } else {
         Log::error('Не удалось выполнить сканирование');
     }

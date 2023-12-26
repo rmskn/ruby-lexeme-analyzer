@@ -316,26 +316,7 @@ class Compiler
             return;
         }
 
-        switch ($this->config->realtimeOutputMode) {
-            case RealtimeOutputModeEnum::TOKENS_WITH_HEADER:
-                if (!$this->headerWasPrint) {
-                    echo "Литерал\t|\tТип\n";
-                    $this->headerWasPrint = true;
-                }
-            case RealtimeOutputModeEnum::ONLY_TOKENS:
-                $row = "{$token}\t|\t";
-
-                if ($type === TokenTypeEnum::SERVICE) {
-                    $row .= TokenTypeEnum::IDENTIFIER->value;
-                } else {
-                    $row .= $type->value;
-                }
-
-                echo $row . "\n";
-
-                break;
-            case RealtimeOutputModeEnum::OFF:
-        }
+        $this->realtimeOutput($token, $type);
 
         switch ($type) {
             case TokenTypeEnum::SERVICE:
@@ -371,6 +352,30 @@ class Compiler
 
                 break;
             default:
+        }
+    }
+
+    private function realtimeOutput(string $token, TokenTypeEnum $type): void
+    {
+        switch ($this->config->realtimeOutputMode) {
+            case RealtimeOutputModeEnum::TOKENS_WITH_HEADER:
+                if (!$this->headerWasPrint) {
+                    echo "Литерал\t|\tТип\n";
+                    $this->headerWasPrint = true;
+                }
+            case RealtimeOutputModeEnum::ONLY_TOKENS:
+                $row = "{$token}\t|\t";
+
+                if ($type === TokenTypeEnum::SERVICE) {
+                    $row .= TokenTypeEnum::IDENTIFIER->value;
+                } else {
+                    $row .= $type->value;
+                }
+
+                echo $row . "\n";
+
+                break;
+            case RealtimeOutputModeEnum::OFF:
         }
     }
 

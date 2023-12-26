@@ -13,5 +13,6 @@
   "serviceWords": ["until", "do", "end"],
   "globalVariableSymbol": "$",
   "displayComments": false,
-  "realtimeOutputMode": 2
+  "realtimeOutputMode": 2,
+  "printResult": true
 }
