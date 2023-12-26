@@ -159,7 +159,7 @@ class Compiler
                         // Переход к распознованию следующей лексемы
                         $type = null;
                     } else {
-                        Log::error("Некорректный литерал: {$token}");
+                        Log::error("Некорректный литерал: {$token}{$char}");
 
                         return null;
                     }
