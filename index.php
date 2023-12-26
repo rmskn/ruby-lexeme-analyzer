@@ -22,7 +22,7 @@ $compiler = new Compiler($config, $sets);
 foreach ($config->inputFileNames as $inputFileName) {
     echo "Сканирование файла {$inputFileName}\n";
     // Чтение информации из входного файла
-    $inputFileData = file_get_contents('data/' . $inputFileName);
+    $inputFileData = file_get_contents($config->pathToDataDir . $inputFileName);
 
     // Сканирование файла
     $result = $compiler->scan($inputFileData);
