@@ -8,7 +8,6 @@ use App\Models\Enums\RealtimeOutputModeEnum;
 use App\Models\Enums\TokenTypeEnum;
 use App\Models\Sets;
 use App\Models\TokenAddress;
-use Illuminate\Support\Collection;
 
 class Compiler
 {
@@ -28,40 +27,40 @@ class Compiler
 
     private bool $headerWasPrint = false;
     /**
-     * @var Collection<int, TokenAddress>
+     * @var array<int, TokenAddress>
      */
-    private Collection $standardTable;
+    private array $standardTable;
 
     /**
-     * @var Collection<int, string>
+     * @var array<int, string>
      */
-    private Collection $serviceWords; // 1
+    private array $serviceWords; // 1
 
     /**
-     * @var Collection<int, string>
+     * @var array<int, string>
      */
-    private Collection $identifiers; // 2
+    private array $identifiers; // 2
 
     /**
-     * @var Collection<int, string>
+     * @var array<int, string>
      */
-    private Collection $literals; // 3
+    private array $literals; // 3
 
     /**
-     * @var Collection<int, string>
+     * @var array<int, string>
      */
-    private Collection $separators; // 4
+    private array $separators; // 4
 
     public function __construct(
         private readonly object $config,
-        private readonly Sets $sets,
+        private readonly Sets   $sets,
     )
     {
-        $this->standardTable = collect();
-        $this->serviceWords = collect();
-        $this->identifiers = collect();
-        $this->literals = collect();
-        $this->separators = collect();
+        $this->standardTable = [];
+        $this->serviceWords = [];
+        $this->identifiers = [];
+        $this->literals = [];
+        $this->separators = [];
     }
 
     public function scan(string $inputFileData): ?bool
@@ -77,28 +76,28 @@ class Compiler
         $token = '';
 
         // Распознование лексемы
-        while (!$text->isEmpty()) {
+        while (!empty($text)) {
             // Получение первого символа
-            $char = $text->first();
+            $char = reset($text);
 
             switch ($type) {
                 case null: // Тип лексемы пока не определён
                     if (
                         ($char === $this->config->globalVariableSymbol) // Условие для глобальных переменных
-                        || $this->sets->L->contains($char)
+                        || $this->inArray($char, $this->sets->L)
                     ) {
                         // Сивол является латинской буквой или подчёркиванием, лексема является идентификатором
                         $type = TokenTypeEnum::IDENTIFIER;
 
                         //Добавление символа к лексеме
                         $token = $char;
-                    } elseif ($this->sets->D->contains($char)) {
+                    } elseif ($this->inArray($char, $this->sets->D)) {
                         // Сивол является цифрой, лексема является литералом
                         $type = TokenTypeEnum::LITERAL;
 
                         //Добавление символа к лексеме
                         $token = $char;
-                    } elseif ($this->sets->P->contains($char)) {
+                    } elseif ($this->inArray($char, $this->sets->P)) {
                         // Сивол является цифрой, вероятнее всего лексема является разделителем
                         $type = TokenTypeEnum::SEPARATOR;
 
@@ -107,19 +106,19 @@ class Compiler
                     }
 
                     // Удаление первого символа
-                    $text->shift();
+                    array_shift($text);
 
                     break;
                 case TokenTypeEnum::IDENTIFIER: // Тип лексемы - идентификатор
-                    if ($this->sets->L->contains($char) || $this->sets->D->contains($char)) {
+                    if ($this->inArray($char, $this->sets->L) || $this->inArray($char, $this->sets->D)) {
                         // Символ является латинской буквой, цифрой или подчёркиванием,
                         // поэтому добавляем его к лексеме
                         $token .= $char;
 
                         // Удаление первого символа
-                        $text->shift();
-                    } elseif ($this->sets->P->contains($char) || $this->sets->E->contains($char)) {
-                        if (in_array($token, $this->config->serviceWords, true)) {
+                        array_shift($text);
+                    } elseif ($this->inArray($char, $this->sets->P) || $this->inArray($char, $this->sets->E)) {
+                        if ($this->inArray($token, $this->config->serviceWords)) {
                             // Изменение типа на сервсиное слово
                             $type = TokenTypeEnum::SERVICE;
                         } else {
@@ -144,14 +143,14 @@ class Compiler
 
                     break;
                 case TokenTypeEnum::LITERAL: // Тип лексемы - литерал
-                    if ($this->sets->D->contains($char)) {
+                    if ($this->inArray($char, $this->sets->D)) {
                         // Символ является цифрой,
                         // поэтому добавляем его к лексеме
                         $token .= $char;
 
                         // Удаление первого символа
-                        $text->shift();
-                    } elseif ($this->sets->P->contains($char) || $this->sets->E->contains($char)) {
+                        array_shift($text);
+                    } elseif ($this->inArray($char, $this->sets->P) || $this->inArray($char, $this->sets->E)) {
                         // Добавление лексемы и её предварительного типа в таблицу лексем
                         $this->addToken($token, $type);
 
@@ -168,7 +167,7 @@ class Compiler
                     // Проверка на однострочный комментарий
                     if ($token === $this->config->comment->single) {
                         // Пропуск символов в комментарии
-                        while (!$text->isEmpty()) {
+                        while (!empty($text)) {
                             if ($char === chr(13)) {
                                 $this->addToken($token, TokenTypeEnum::COMMENT);
 
@@ -176,46 +175,50 @@ class Compiler
                             }
 
                             // Удаление первого символа
-                            $token .= $text->shift();
+                            $token .= array_shift($text);
 
                             // Получение первого символа
-                            $char = $text->first();
+                            $char = reset($text);
                         }
 
                         // Переход к распознованию следующей лексемы
                         $type = null;
-                    } elseif ($this->sets->P->contains($char)) {
+                    } elseif ($this->inArray($char, $this->sets->P)) {
                         // Символ является разделителем,
                         // поэтому добавляем его к лексеме
                         $token .= $char;
 
                         // Удаление первого символа
-                        $text->shift();
+                        array_shift($text);
                     } else { // Проверка на многострочный комментарий комментарий
                         $commentConfig = $this->config->comment;
 
                         // Проверка на начало комментария
                         $commentStartLength = strlen($commentConfig->start);
                         $candidateForCommentStart = $token
-                            . implode('', $text->take($commentStartLength - strlen($token))->toArray());
+                            . implode(
+                                '',
+                                array_slice($text, 0, $commentStartLength - strlen($token))
+                            );
 
                         if ($candidateForCommentStart === $commentConfig->start) {
                             // Удаление обозначения начала комментария
-                            $text->shift($commentStartLength - strlen($token));
+                            $text = array_slice($text, $commentStartLength - strlen($token));
 
                             // Формирование текста комментария
                             $token = $candidateForCommentStart;
 
                             $commentIsCloseFlag = false;
                             $commentEndLength = strlen($commentConfig->end);
-                            while (!$text->isEmpty()) {
+                            while (!empty($text)) {
                                 $candidateForCommentEnd = implode(
-                                    '', $text->take($commentEndLength)->toArray()
+                                    '', array_slice($text, 0, $commentEndLength)
                                 );
 
                                 if ($candidateForCommentEnd === $commentConfig->end) {
                                     // Удаление обозначения конца комментария и формирования полного текста комментария
-                                    $token .= implode('', $text->shift($commentEndLength)?->toArray());
+                                    $token .= $candidateForCommentEnd;
+                                    $text = array_slice($text, $commentEndLength);
 
                                     $this->addToken($token, TokenTypeEnum::COMMENT);
 
@@ -227,7 +230,7 @@ class Compiler
                                 }
 
                                 // Удаление первого символа и формирование текста комментария
-                                $token .= $text->shift();
+                                $token .= array_shift($text);
                             }
 
                             // Проерка на закрытие комментария
@@ -236,7 +239,7 @@ class Compiler
 
                                 return null;
                             }
-                        } elseif (in_array($token, $this->config->operators, true)) {
+                        } elseif ($this->inArray($token, $this->config->operators)) {
                             // Добавление лексемы и её предварительного типа в таблицу лексем
                             $this->addToken($token, $type);
 
@@ -279,13 +282,13 @@ class Compiler
     }
 
     /**
-     * @param Collection<int, string> $collection
+     * @param array<int, string> $array
      */
-    private function printTable(string $header, Collection $collection): void
+    private function printTable(string $header, array $array): void
     {
         echo $header . "\n";
 
-        foreach ($collection as $index => $item) {
+        foreach ($array as $index => $item) {
             echo "{$index}:\t{$item}\n";
         }
     }
@@ -297,16 +300,16 @@ class Compiler
 
         foreach ($this->standardTable as $item) {
             echo "{$item->table},{$item->number}\t"
-                . $this->getTableCollectionByNumber($item->table)[$item->number] . "\n";
+                . $this->getTableByNumber($item->table)[$item->number] . "\n";
         }
     }
 
     /**
-     * @return Collection<int, string>
+     * @return array<int, string>
      */
-    private function prepareInputFileData(string $inputFileData): Collection
+    private function prepareInputFileData(string $inputFileData): array
     {
-        return collect(str_split($inputFileData));
+        return str_split($inputFileData);
     }
 
     private function addToken(string $token, TokenTypeEnum $type): void
@@ -322,7 +325,7 @@ class Compiler
                 $this->serviceWords[] = $token;
                 $this->standardTable[] = new TokenAddress(
                     $this->getNumberOfTableByTokenTypeName($type),
-                    $this->serviceWords->count() - 1
+                    count($this->serviceWords) - 1
                 );
 
                 break;
@@ -330,7 +333,7 @@ class Compiler
                 $this->identifiers[] = $token;
                 $this->standardTable[] = new TokenAddress(
                     $this->getNumberOfTableByTokenTypeName($type),
-                    $this->identifiers->count() - 1
+                    count($this->identifiers) - 1
                 );
 
                 break;
@@ -338,7 +341,7 @@ class Compiler
                 $this->literals[] = $token;
                 $this->standardTable[] = new TokenAddress(
                     $this->getNumberOfTableByTokenTypeName($type),
-                    $this->literals->count() - 1
+                    count($this->literals) - 1
                 );
 
                 break;
@@ -346,7 +349,7 @@ class Compiler
                 $this->separators[] = $token;
                 $this->standardTable[] = new TokenAddress(
                     $this->getNumberOfTableByTokenTypeName($type),
-                    $this->separators->count() - 1
+                    count($this->separators) - 1
                 );
 
                 break;
@@ -379,9 +382,9 @@ class Compiler
     }
 
     /**
-     * @return Collection<int, string>
+     * @return array<int, string>
      */
-    private function getTableCollectionByNumber(int $number): Collection
+    private function getTableByNumber(int $number): array
     {
         return $this->{self::numberToTableMap[$number]};
     }
@@ -389,5 +392,10 @@ class Compiler
     private function getNumberOfTableByTokenTypeName(TokenTypeEnum $number): int
     {
         return self::tokenTypeNameToTableNumberMap[$number->name];
+    }
+
+    private function inArray(mixed $needle, array $array): bool
+    {
+        return in_array($needle, $array, true);
     }
 }

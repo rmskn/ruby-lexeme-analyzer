@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Sets;
-use Illuminate\Support\Collection;
 
 class SetsUtils
 {
@@ -20,24 +19,28 @@ class SetsUtils
     }
 
     /**
-     * @return Collection<int, string>
+     * @return array<int, string>
      */
-    private static function generateL(): Collection // Формирование множества прописных латинских букв и символа '_'
+    private static function generateL(): array // Формирование множества прописных латинских букв и символа '_'
     {
         $stringL = '';
         for ($i = 65; $i <= 90; $i++) {
             $stringL .= chr($i);
         }
 
-        return collect(str_split($stringL . strtolower($stringL)))->push('_');
+        $result = str_split($stringL . strtolower($stringL));
+
+        $result[] = '_';
+
+        return $result;
     }
 
     /**
-     * @return Collection<int, string>
+     * @return array<int, string>
      */
-    private static function generateD(): Collection // Формирование множества цифр
+    private static function generateD(): array // Формирование множества цифр
     {
-        $D = collect();
+        $D = [];
 
         for ($i = 48; $i <= 57; $i++) {
             $D[] = chr($i);
@@ -47,49 +50,45 @@ class SetsUtils
     }
 
     /**
-     * @return Collection<int, string>
+     * @return array<int, string>
      */
-    private static function generateP(): Collection // Формирование множества знаков препинания
+    private static function generateP(): array // Формирование множества знаков препинания
     {
-        return collect(
-            [
-                '=',
-                '+',
-                '-',
-                '*',
-                '/',
-                ',',
-                ';',
-                '!',
-                '<',
-                '>',
-                '(',
-                ')',
-                '{',
-                '}',
-                '_',
-                '#',
-                '&',
-                '^',
-                '%',
-                '$',
-                '@',
-            ]
-        );
+        return [
+            '=',
+            '+',
+            '-',
+            '*',
+            '/',
+            ',',
+            ';',
+            '!',
+            '<',
+            '>',
+            '(',
+            ')',
+            '{',
+            '}',
+            '_',
+            '#',
+            '&',
+            '^',
+            '%',
+            '$',
+            '@',
+        ];
     }
 
     /**
-     * @return Collection<int, string>
+     * @return array<int, string>
      */
-    private static function generateE(): Collection // Создание множества игнорируемых символов
+    private static function generateE(): array // Создание множества игнорируемых символов
     {
-        return collect(
-            [
-                chr(32),
-                chr(8),
-                chr(10),
-                chr(13),
-            ]
-        );
+        return [
+            chr(32),
+            chr(8),
+            chr(10),
+            chr(13),
+        ];
     }
 }

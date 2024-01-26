@@ -36,6 +36,6 @@ foreach ($config->inputFileNames as $inputFileName) {
 
         Log::info("Сканирование файла {$inputFileName} успешно завершено\n");
     } else {
-        Log::error('Не удалось выполнить сканирование');
+        Log::error("Не удалось выполнить сканирование файла {$inputFileName}");
     }
 }

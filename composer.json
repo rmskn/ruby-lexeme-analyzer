@@ -10,12 +10,5 @@
             "name": "Kirill Tremaskin",
             "email": "tremaskinkd@yandex.ru"
         }
-    ],
-    "require": {
-        "illuminate/collections": "^10.29"
-    }
-    ,
-    "require-dev": {
-        "roave/security-advisories": "dev-latest"
-    }
+    ]
 }
